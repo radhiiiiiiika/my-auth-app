@@ -1,24 +1,47 @@
-import logo from './logo.svg';
+// src/App.js
+import React, { useState } from 'react';
+import { AuthProvider, useAuth } from './utils/AuthContext';
+import Login from './components/login';
+import Register from './components/register';
+import Dashboard from './components/Dashboard';
 import './App.css';
+
+function AuthContainer() {
+  const [view, setView] = useState('login');
+  const { user, loading } = useAuth();
+
+  const switchToRegister = () => setView('register');
+  const switchToLogin = () => setView('login');
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Dashboard />;
+  }
+
+  return (
+    <>
+      {view === 'login' ? (
+        <Login switchToRegister={switchToRegister} />
+      ) : (
+        <Register switchToLogin={switchToLogin} />
+      )}
+    </>
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <AuthContainer />
+    </AuthProvider>
   );
 }
 
